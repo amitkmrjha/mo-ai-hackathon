@@ -111,14 +111,16 @@ lazy val `mo-ai-hackathon` = (project in file("."))
   .aggregate(
     `clarify-image`,
     `clarify-ai-protobuf`,
-    `clarify-ai-common`
-
+    `clarify-ai-common`,
+    `gpt-description`,
+    `hackathon-app`
   )
 lazy val `clarify-ai-common`            = (project in file("clarify-ai-common"))
   .configs(IntegrationTest)
   .settings(buildSettings: _*)
   .settings(
-    libraryDependencies ++= commonDeps ++ jacksonDeps
+    libraryDependencies ++= commonDeps ++ jacksonDeps,
+    excludeDependencies ++= excludeXmlConflictDeps ++ excludeProtobufConflictDeps
   )
 
 
@@ -126,12 +128,34 @@ lazy val `clarify-ai-protobuf` = (project in file("clarify-ai-protobuf"))
   .enablePlugins(AkkaGrpcPlugin)
   .settings(
     libraryDependencies += scalapbRuntime,
-    excludeDependencies ++= excludeProtobufConflictDeps
+    excludeDependencies ++= excludeXmlConflictDeps ++ excludeProtobufConflictDeps
   )
 
 lazy val `clarify-image`            = (project in file("clarify-image"))
   .configs(IntegrationTest)
   .settings(buildSettings: _*)
   .settings(
-    libraryDependencies ++= commonDeps ++ Seq(clarifyAI)
-).dependsOn(`clarify-ai-common`)
+    libraryDependencies ++= commonDeps ++ Seq(clarifyAI),
+    excludeDependencies ++= excludeXmlConflictDeps ++ excludeProtobufConflictDeps
+  ).dependsOn(`clarify-ai-common`)
+
+lazy val `gpt-description`            = (project in file("gpt-description"))
+  .configs(IntegrationTest)
+  .settings(buildSettings: _*)
+  .settings(
+    libraryDependencies ++= commonDeps ++ Seq(openAiGpt),
+    excludeDependencies ++= excludeXmlConflictDeps ++ excludeProtobufConflictDeps
+  )
+
+lazy val `hackathon-app`            = (project in file("hackathon-app"))
+  .configs(IntegrationTest)
+  .settings(buildSettings: _*)
+  .settings(
+    libraryDependencies ++= commonDeps ++ akkaDeps ++ akkaHttpDeps ++ akkaStreamsDeps ++ Seq(scalapbRuntime),
+    excludeDependencies ++= excludeXmlConflictDeps ++ excludeProtobufConflictDeps
+  )
+  .settings(
+    //Temporary disable scaladoc publish jira issue: STR-523
+    Compile / packageDoc / publishArtifact := false
+  )
+  .dependsOn(`clarify-image`, `gpt-description`)
