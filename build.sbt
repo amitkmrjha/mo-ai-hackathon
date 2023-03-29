@@ -109,11 +109,24 @@ lazy val dockerSettings = Seq(
 lazy val `mo-ai-hackathon` = (project in file("."))
   .settings(buildSettings: _*)
   .aggregate(
+    `hackathon-http-utils`,
     `clarify-image`,
     `clarify-ai-protobuf`,
-    `clarify-ai-common`
-
+    `clarify-ai-common`,
+    `hackathon-asset`
   )
+lazy val `hackathon-http-utils` = (project in file("hackathon-http-utils"))
+  .configs(IntegrationTest)
+  .settings(buildSettings: _*)
+  .settings(
+    Defaults.itSettings,
+    libraryDependencies ++= commonDeps ++ akkaDeps ++ akkaStreamsDeps ++ akkaHttpDeps ++ monitoringDeps ++ Seq(
+      bouncyCastle,
+      awsSecretManager
+    ),
+    excludeDependencies ++= excludeProtobufConflictDeps ++ excludeXmlConflictDeps
+  )
+  .dependsOn(`clarify-ai-common`)
 lazy val `clarify-ai-common`            = (project in file("clarify-ai-common"))
   .configs(IntegrationTest)
   .settings(buildSettings: _*)
@@ -135,3 +148,25 @@ lazy val `clarify-image`            = (project in file("clarify-image"))
   .settings(
     libraryDependencies ++= commonDeps ++ Seq(clarifyAI)
 ).dependsOn(`clarify-ai-common`)
+
+lazy val `hackathon-asset` = (project in file("hackathon-asset"))
+  .configs(IntegrationTest)
+  .settings(buildSettings: _*)
+  .enablePlugins(JavaServerAppPackaging, JavaAgent)
+  .settings(
+    libraryDependencies ++= commonDeps ++ alpakkaKafkaDeps ++ akkaDeps ++ akkaStreamsDeps ++ akkaClusterDeps ++ akkaHttpDeps ++ monitoringDeps ++ scalaLikeJdbcDeps ++ Seq(
+      scalapbRuntime,
+      bouncyCastle
+    ),
+    excludeDependencies ++= excludeProtobufConflictDeps ++ excludeXmlConflictDeps,
+    dockerSettings,
+    javaAgents += kanelaAgent
+  )
+  .settings(
+    //Temporary disable scaladoc publish jira issue: STR-523
+    Compile / packageDoc / publishArtifact := false
+  )
+  .dependsOn(`clarify-ai-common`,`hackathon-http-utils`)
+
+
+
