@@ -41,5 +41,6 @@ object Version {
   val gatlingGrpc                 = "0.13.0"
   val googleCommonProtos          = "2.5.0-2"
   val clarify                     = "9.2.0"
+  val gpt                         = "0.11.1"
   val scalameta                   = "0.7.29"
 }

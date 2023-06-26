@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="JSONOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.bynder.mo.common.logging.JsonLoggingLayout">
+                <jsonFormatter
+                        class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+                    <prettyPrint>false</prettyPrint>
+                </jsonFormatter>
+                <timestampFormat>yyyy-MM-dd'T'HH:mm:ss.SSSX</timestampFormat>
+                <timestampFormatTimezoneId>Etc/UTC</timestampFormatTimezoneId>
+                <appendLineSeparator>true</appendLineSeparator>
+            </layout>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%date{ISO8601}] [%level] [%logger] [%marker] [%thread] [%class{0}] - %msg MDC: {%mdc}%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <!--<appender-ref ref="STDOUT" />-->
+        <appender-ref ref="JSONOUT" />
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <root level="${MO_EXTRACT_LOG_LEVEL:-INFO}">
+        <appender-ref ref="ASYNC"/>
+    </root>
+
+    <!-- When running in DEBUG mode, we don't want the following showing up in the logs-->
+
+    <logger name="com.zaxxer.hikari" level="ERROR" />
+    <logger name="slick.jdbc" level="ERROR" />
+    <logger name="scalikejdbc.streams" level="ERROR" />
+    <logger name="slick.basic" level="ERROR" />
+    <logger name="slick.util" level="ERROR" />
+    <logger name="oshi.util" level="ERROR" />
+    <logger name="org.apache.kafka" level="ERROR" />
+    <logger name="akka.cluster.sharding.typed.internal" level="ERROR" />
+
+</configuration>

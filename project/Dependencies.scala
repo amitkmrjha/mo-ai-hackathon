@@ -133,5 +133,6 @@ object Dependencies {
     "com.thesamet.scalapb.common-protos" %% "proto-google-common-protos-scalapb_0.11" % Version.googleCommonProtos
   )
   val clarifyAI =  "com.clarifai" % "clarifai-grpc" % Version.clarify
+  val openAiGpt = "com.theokanning.openai-gpt3-java" % "service" % Version.gpt
 
 }
